@@ -82,6 +82,7 @@ app.post("/api/contact", (req, res) => {
 });
 
 app.post("/api/admin/login", async (req, res) => {
+  try{
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "ChangeMoi123!";
   if ( req.body.username !==username ||
@@ -98,7 +99,8 @@ app.post("/api/admin/login", async (req, res) => {
     res.json({message: "connexion reussie"});
   });
 } catch (error) {
-         res.status(500).json({error: "erreur du serveur"});
+         res.status(500).json({error: "erreur du serveur"
+                              });
 }
 });
               
