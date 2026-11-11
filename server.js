@@ -26,7 +26,14 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 8 * 60 * 60 * 1000 }
 }));
 app.use("/uploads", express.static(UPLOAD_DIR));
-app.use(express.static(path.join(ROOT, "public")));
+app.use(express.static(path.join(ROOT)));
+app.get("/", (req, res) => {
+   res.sendFile(path.join(ROOT,"index.html"));
+});
+app.get("/admin", (req, res) => {
+   res.sendFile(path.join(ROOT,"index.html"));
+});
+
 
 const readRooms = () => JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
 const saveRooms = rooms => fs.writeFileSync(DB_FILE, JSON.stringify(rooms, null, 2));
@@ -57,9 +64,7 @@ app.get("/api/rooms", (req, res) => {
   );
   res.json(rooms);
 });
-app.get('/', (req, res) => {
-   res.sendFile(__dirname + '/index.html');
-});
+
 app.get("/api/rooms/:id", (req, res) => {
   const room = readRooms().find(r => r.id === req.params.id && r.published);
   room ? res.json(room) : res.status(404).json({ error: "Annonce introuvable." });
