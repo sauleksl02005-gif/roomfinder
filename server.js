@@ -57,6 +57,9 @@ app.get("/api/rooms", (req, res) => {
   );
   res.json(rooms);
 });
+app.get('/', (req, res) => {
+   res.sendFile(__dirname + '/index.html');
+});
 app.get("/api/rooms/:id", (req, res) => {
   const room = readRooms().find(r => r.id === req.params.id && r.published);
   room ? res.json(room) : res.status(404).json({ error: "Annonce introuvable." });
