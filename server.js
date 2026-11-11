@@ -84,12 +84,24 @@ app.post("/api/contact", (req, res) => {
 app.post("/api/admin/login", async (req, res) => {
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "ChangeMoi123!";
-  if (req.body.username === username && await bcrypt.compare(req.body.password || "", await bcrypt.hash(password, 10))) {
-    req.session.isAdmin = true;
-    return res.json({ message: "Connexion réussie." });
-  }
-  res.status(401).json({ error: "Identifiants incorrects." });
+  if ( req.body.username !==username ||
+      req.body.password !== password
+      ) {
+          return res.status(401).json({ error: "Identifiants incorrects."});
+        }
+  req.session.isAdmin =true;
+  req.session.save((err)=> {
+    if (err){
+      retrurn res.status(500).json({
+        error: "erreur de session "});
+    }
+    res.json({message: "connexion reussie"});
+  });
+} catch (error) {
+         res.status(500).json({error: "erreur du serveur"});
+}
 });
+              
 app.post("/api/admin/logout", adminOnly, (req, res) => req.session.destroy(() => res.json({ message: "Déconnexion." })));
 app.get("/api/admin/me", (req, res) => res.json({ authenticated: !!req.session.isAdmin }));
 app.get("/api/admin/rooms", adminOnly, (req, res) => res.json(readRooms()));
