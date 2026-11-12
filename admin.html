@@ -1,6 +1,77 @@
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Administration — RoomFinder</title><link rel="stylesheet" href="/style.css"></head><body>
-<header class="topbar"><a class="brand" href="/">Room<span>Finder</span><small> ADMIN</small></a><nav><a href="/">Voir le site</a></nav></header>
-<main class="admin-wrap"><div id="loginBox" class="admin-box"><span class="eyebrow">ESPACE SÉCURISÉ</span><h2>Connexion administrateur</h2><form id="loginForm" class="detail-form"><input name="username" placeholder="Identifiant" required><input name="password" type="password" placeholder="Mot de passe" required><button class="btn">Se connecter</button></form><p class="notice">Les identifiants sont définis dans le fichier .env. Changez le mot de passe avant toute mise en ligne.</p></div>
-<div id="dashboard" class="hidden"><div class="section-head"><h2>Tableau de bord</h2><button id="logout" class="btn danger">Déconnexion</button></div>
-<div class="admin-box"><h3>Ajouter une chambre</h3><form id="roomForm" class="detail-form" enctype="multipart/form-data"><div class="admin-grid"><input class="form-control" name="title" placeholder="Titre de l'annonce" required><input class="form-control" name="city" placeholder="Ville (ex. Douala)" required><input class="form-control" name="neighborhood" placeholder="Quartier"><input class="form-control" name="price" type="number" min="0" placeholder="Prix en FCFA" required><select class="form-control" name="duration"><option>Courte durée</option><option>Longue durée</option></select><input class="form-control" name="phone" placeholder="Téléphone de contact (facultatif)"><input class="form-control" name="address" placeholder="Adresse"><input class="form-control" name="amenities" placeholder="Équipements (Wi-Fi, douche...)"><input class="form-control" name="latitude" placeholder="Latitude GPS"><input class="form-control" name="longitude" placeholder="Longitude GPS"></div><textarea class="form-control" name="description" rows="3" placeholder="Description"></textarea><label>Photos (JPEG, PNG ou WebP, 5 Mo maximum par photo) <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple></label><button class="btn">Publier la chambre</button></form></div>
-<div class="admin-box"><h3>Liste des chambres</h3><div id="adminRooms">Chargement…</div></div><div class="admin-box"><h3>Messages reçus</h3><div id="messages">Chargement…</div></div></div></main><div id="toast" class="toast"></div><script src="/admin.js"></script></body></html>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administration — RoomFinder</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Room<span>Finder</span><small> ADMIN</small></a>
+    <nav><a href="/">Voir le site</a></nav>
+  </header>
+
+  <main class="admin-wrap">
+    <div id="loginBox" class="admin-box">
+      <span class="eyebrow">ESPACE SÉCURISÉ</span>
+      <h2>Connexion administrateur</h2>
+      <form id="loginForm" class="detail-form">
+        <input name="username" placeholder="Identifiant" autocomplete="username" required>
+        <input name="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
+        <button class="btn" type="submit">Se connecter</button>
+      </form>
+      <p class="notice">Les identifiants sont configurés dans les variables d'environnement de Render.</p>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="section-head">
+        <h2>Tableau de bord</h2>
+        <button id="logout" class="btn danger" type="button">Déconnexion</button>
+      </div>
+
+      <div class="admin-box">
+        <h3>Ajouter une chambre</h3>
+        <form id="roomForm" class="detail-form" enctype="multipart/form-data">
+          <div class="admin-grid">
+            <input class="form-control" name="title" placeholder="Titre de l'annonce" required>
+            <input class="form-control" name="city" placeholder="Ville (ex. Douala)" required>
+            <input class="form-control" name="neighborhood" placeholder="Quartier">
+            <input class="form-control" name="price" type="number" min="0" placeholder="Prix en FCFA" required>
+            <select class="form-control" name="duration">
+              <option>Courte durée</option>
+              <option>Longue durée</option>
+            </select>
+            <input class="form-control" name="phone" placeholder="Téléphone de contact (facultatif)">
+            <input class="form-control" name="address" placeholder="Adresse">
+            <input class="form-control" name="amenities" placeholder="Équipements (Wi-Fi, douche...)">
+          </div>
+
+          <div class="admin-box" style="background:#fff;border:1px solid var(--line);padding:16px;margin:0">
+            <h3>Localisation de la chambre</h3>
+            <p class="notice">Autorise la localisation du navigateur pour remplir automatiquement les coordonnées GPS. Le site doit être ouvert en HTTPS.</p>
+            <button id="useLocation" class="btn" type="button">⌖ Utiliser ma position actuelle</button>
+            <p id="locationStatus" class="notice" role="status" aria-live="polite"></p>
+            <div class="admin-grid">
+              <input class="form-control" name="latitude" id="latitude" placeholder="Latitude GPS" inputmode="decimal">
+              <input class="form-control" name="longitude" id="longitude" placeholder="Longitude GPS" inputmode="decimal">
+            </div>
+          </div>
+
+          <textarea class="form-control" name="description" rows="3" placeholder="Description"></textarea>
+          <label>Photos (JPEG, PNG ou WebP, 5 Mo maximum par photo)
+            <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple>
+          </label>
+          <button class="btn" type="submit">Publier la chambre</button>
+        </form>
+      </div>
+
+      <div class="admin-box"><h3>Liste des chambres</h3><div id="adminRooms">Chargement…</div></div>
+      <div class="admin-box"><h3>Messages reçus</h3><div id="messages">Chargement…</div></div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/admin.js" defer></script>
+</body>
+</html>
