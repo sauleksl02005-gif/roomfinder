@@ -1,99 +1,24 @@
-const $ = selector => document.querySelector(selector);
-const toast = message => {
-  const element = $('#toast');
-  element.textContent = message;
-  element.style.display = 'block';
-  setTimeout(() => { element.style.display = 'none'; }, 3200);
-};
-
+const $ = s => document.querySelector(s);
+const toast = msg => { const el = $('#toast'); el.textContent = msg; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3500); };
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('#year').textContent = new Date().getFullYear();
-
-function escapeHtml(value = '') {
-  return String(value).replace(/[&<>"']/g, character => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  })[character]);
-}
-
-function safePhotoUrl(value) {
-  try {
-    const url = new URL(String(value), window.location.origin);
-    if (url.protocol !== 'https:' && url.origin !== window.location.origin) return '';
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return '';
-    return url.href;
-  } catch { return ''; }
-}
-
-async function readJson(response) {
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Erreur HTTP ${response.status}`);
-  return data;
-}
-
 async function loadRooms() {
-  const params = new URLSearchParams();
-  if ($('#query').value.trim()) params.set('q', $('#query').value.trim());
-  if ($('#duration').value) params.set('duration', $('#duration').value);
-  if ($('#maxPrice').value) params.set('maxPrice', $('#maxPrice').value);
-  const box = $('#rooms');
-  box.innerHTML = '<p>Chargement…</p>';
+  const p = new URLSearchParams(); if ($('#query').value.trim()) p.set('q', $('#query').value.trim()); if ($('#duration').value) p.set('duration', $('#duration').value); if ($('#maxPrice').value) p.set('maxPrice', $('#maxPrice').value);
+  const box = $('#rooms'); box.innerHTML = '<p>Chargement…</p>';
   try {
-    const rooms = await readJson(await fetch(`/api/rooms?${params.toString()}`));
+    const r = await fetch('/api/rooms?' + p); const rooms = await r.json(); if (!r.ok) throw new Error(rooms.error);
     $('#count').textContent = `${rooms.length} annonce(s)`;
-    box.innerHTML = rooms.length ? rooms.map(room => {
-      const photo = safePhotoUrl(room.photos?.[0]);
-      return `<article class="room-card" data-id="${escapeHtml(room.id)}">
-        <div class="room-photo">${photo ? `<img src="${escapeHtml(photo)}" alt="Photo de ${escapeHtml(room.title)}" loading="lazy">` : '⌂'}</div>
-        <div class="room-info"><span class="pill">${escapeHtml(room.duration)}</span><h3>${escapeHtml(room.title)}</h3>
-        <div class="room-meta">⌖ ${escapeHtml(room.neighborhood || '')}${room.neighborhood ? ', ' : ''}${escapeHtml(room.city)}</div>
-        <div class="price">${Number(room.price).toLocaleString('fr-FR')} FCFA</div></div></article>`;
-    }).join('') : '<p>Aucune chambre ne correspond à cette recherche.</p>';
-    box.querySelectorAll('.room-card').forEach(card => card.addEventListener('click', () => showRoom(card.dataset.id)));
-  } catch (error) {
-    box.innerHTML = `<p>${escapeHtml(error.message || 'Impossible de charger les annonces.')}</p>`;
-  }
+    box.innerHTML = rooms.length ? rooms.map(x => `<article class="room-card" data-id="${esc(x.id)}"><div class="room-photo">${x.photos?.[0] ? `<img src="${esc(x.photos[0])}" alt="Photo de chambre">` : '⌂'}</div><div class="room-info"><span class="pill">${esc(x.duration)}</span><h3>${esc(x.title)}</h3><div class="room-meta">⌖ ${esc(x.neighborhood)}${x.neighborhood ? ', ' : ''}${esc(x.city)}</div><div class="price">${Number(x.price).toLocaleString('fr-FR')} FCFA</div></div></article>`).join('') : '<p>Aucune chambre ne correspond à cette recherche.</p>';
+    box.querySelectorAll('.room-card').forEach(c => c.addEventListener('click', () => showRoom(c.dataset.id)));
+  } catch (e) { box.innerHTML = `<p>Impossible de charger les annonces : ${esc(e.message)}</p>`; }
 }
-
-$('#searchForm').addEventListener('submit', event => {
-  event.preventDefault();
-  loadRooms();
-});
-
+$('#searchForm').addEventListener('submit', e => { e.preventDefault(); loadRooms(); });
 async function showRoom(id) {
   try {
-    const room = await readJson(await fetch(`/api/rooms/${encodeURIComponent(id)}`));
-    const photos = (room.photos || []).map(photo => safePhotoUrl(photo)).filter(Boolean);
-    $('#modalContent').innerHTML = `<span class="pill">${escapeHtml(room.duration)}</span><h2>${escapeHtml(room.title)}</h2>
-      <div class="detail-photos">${photos.length ? photos.map(photo => `<img src="${escapeHtml(photo)}" alt="Photo de la chambre" loading="lazy">`).join('') : '<p>Photos à venir</p>'}</div>
-      <h3 class="price">${Number(room.price).toLocaleString('fr-FR')} FCFA</h3>
-      <p>${escapeHtml(room.neighborhood)} · ${escapeHtml(room.city)}</p><p>${escapeHtml(room.description)}</p>
-      <p><b>Équipements :</b> ${escapeHtml(room.amenities || 'Non précisés')}</p>
-      <p>${escapeHtml(room.address || 'Adresse communiquée après contact')}</p>
-      ${room.latitude && room.longitude ? `<p><a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${room.latitude},${room.longitude}`)}">Voir l’itinéraire sur Google Maps ↗</a></p>` : ''}
-      <h3>Envoyer une demande</h3><form class="detail-form" id="contactForm">
-        <input name="name" placeholder="Votre nom" maxlength="100" required>
-        <input name="phone" placeholder="Votre numéro de téléphone" maxlength="30" required>
-        <textarea name="message" placeholder="Votre message" rows="3" maxlength="3000" required></textarea>
-        <button class="btn" type="submit">Envoyer le message</button></form>`;
-    $('#modal').classList.remove('hidden');
-    $('#contactForm').addEventListener('submit', async event => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const data = Object.fromEntries(new FormData(form));
-      data.roomId = id;
-      try {
-        const result = await readJson(await fetch('/api/contact', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
-        }));
-        toast(result.message || 'Message envoyé.');
-        form.reset();
-      } catch (error) { toast(error.message || 'Envoi impossible.'); }
-    });
-  } catch (error) { toast(error.message || 'Impossible de charger cette chambre.'); }
+    const response = await fetch('/api/rooms/' + encodeURIComponent(id)); const r = await response.json(); if (!response.ok) throw new Error(r.error);
+    $('#modalContent').innerHTML = `<span class="pill">${esc(r.duration)}</span><h2>${esc(r.title)}</h2><div class="detail-photos">${(r.photos || []).map(p => `<img src="${esc(p)}" alt="Photo de chambre">`).join('') || '<p>Photos à venir</p>'}</div><h3 class="price">${Number(r.price).toLocaleString('fr-FR')} FCFA</h3><p>${esc(r.neighborhood)} · ${esc(r.city)}</p><p>${esc(r.description)}</p><p><b>Équipements :</b> ${esc(r.amenities || 'Non précisés')}</p><p>${esc(r.address || 'Adresse communiquée après contact')}</p>${r.latitude && r.longitude ? `<p><a class="map-link" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(r.latitude + ',' + r.longitude)}">Voir l’itinéraire sur Google Maps ↗</a></p>` : ''}<h3>Envoyer une demande</h3><form class="detail-form" id="contactForm"><input name="name" placeholder="Votre nom" required><input name="phone" placeholder="Votre téléphone" required><textarea name="message" placeholder="Votre message" rows="3" required></textarea><button class="btn">Envoyer le message</button></form>`;
+    $('#modal').classList.remove('hidden'); $('#contactForm').addEventListener('submit', async e => { e.preventDefault(); const data = Object.fromEntries(new FormData(e.target)); data.roomId = id; const out = await fetch('/api/contact', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); const result = await out.json(); toast(result.message || result.error); if (out.ok) e.target.reset(); });
+  } catch (e) { toast(e.message); }
 }
-
-$('#closeModal').addEventListener('click', () => $('#modal').classList.add('hidden'));
-$('#modal').addEventListener('click', event => {
-  if (event.target.id === 'modal') $('#modal').classList.add('hidden');
-});
-
+$('#closeModal').onclick = () => $('#modal').classList.add('hidden'); $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') $('#modal').classList.add('hidden'); });
 loadRooms();

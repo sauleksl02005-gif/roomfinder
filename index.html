@@ -1,16 +1,10 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RoomFinder Cameroun — Trouvez votre chambre</title><link rel="stylesheet" href="/style.css"></head>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Trouvez une chambre à louer au Cameroun avec RoomFinder."><title>RoomFinder Cameroun — Trouvez votre chambre</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-<header class="topbar"><a class="brand" href="/">Room<span>Finder</span><small> CAMEROUN</small></a><nav><a href="#annonces">Annonces</a><a href="/admin.html">Administration</a></nav></header>
-<main>
-<section class="hero"><div class="hero-copy"><span class="eyebrow">VOTRE LOGEMENT, PLUS FACILEMENT</span><h1>Trouvez une chambre<br><em>au Cameroun.</em></h1><p>Explorez des chambres en courte ou longue durée, près de l'endroit qui vous convient.</p>
-<form id="searchForm" class="search-panel"><input id="query" placeholder="Ville ou quartier (ex. Douala)" aria-label="Ville ou quartier">
-<select id="duration"><option value="">Toutes les durées</option><option value="Courte durée">Courte durée</option><option value="Longue durée">Longue durée</option></select>
-<input id="maxPrice" type="number" min="0" placeholder="Budget max (FCFA)" aria-label="Budget maximum"><button class="btn" type="submit">Rechercher</button></form>
-</div><div class="hero-art"><div class="art-card"><div class="art-window"></div><div class="art-bed"></div><span>Un espace qui vous ressemble</span></div><div class="floating-tag">⌖ Des logements au Cameroun</div></div></section>
-<section class="section" id="annonces"><div class="section-head"><div><span class="eyebrow">SÉLECTION ROOMFINDER</span><h2>Chambres disponibles</h2></div><span id="count" class="muted"></span></div><div id="rooms" class="room-grid"><p>Chargement des annonces…</p></div></section>
-<section class="how"><h2>Comment ça marche ?</h2><div class="steps"><article><b>01</b><h3>Recherchez</h3><p>Indiquez une ville, un quartier et votre durée de location.</p></article><article><b>02</b><h3>Comparez</h3><p>Consultez les photos, les prix et la localisation des chambres.</p></article><article><b>03</b><h3>Contactez</h3><p>Envoyez votre demande directement depuis la fiche du logement.</p></article></div></section>
-</main><footer>© <span id="year"></span> RoomFinder Cameroun · Les annonces sont publiées par l'administration.</footer>
-<div id="modal" class="modal hidden"><div class="modal-card"><button class="close" id="closeModal">×</button><div id="modalContent"></div></div></div>
-<div id="toast" class="toast"></div><script src="/app.js" defer></script></body></html>
+<header class="topbar"><a class="brand" href="/">Room<span>Finder</span><small> CAMEROUN</small></a><nav><a href="#annonces">Annonces</a><a href="/admin">Administration</a></nav></header>
+<main><section class="hero"><div class="hero-inner"><span class="eyebrow">LE LOGEMENT, PLUS SIMPLE</span><h1>Trouvez votre prochaine <em>chambre</em>.</h1><p>Explorez des annonces de chambres au Cameroun et contactez directement les annonceurs.</p><a class="btn" href="#annonces">Voir les annonces</a></div></section>
+<section class="search-section" id="annonces"><div class="section-heading"><div><span class="eyebrow">ROOMFINDER CAMEROUN</span><h2>Les chambres disponibles</h2></div><span id="count" class="count">Chargement…</span></div>
+<form id="searchForm" class="search-panel"><input id="query" placeholder="Ville, quartier ou chambre…"><select id="duration"><option value="">Toutes les durées</option><option value="Jour">Par jour</option><option value="Semaine">Par semaine</option><option value="Mois">Par mois</option></select><input id="maxPrice" type="number" min="0" placeholder="Budget max (FCFA)"><button class="btn" type="submit">Rechercher</button></form>
+<div id="rooms" class="room-grid"><p>Chargement des annonces…</p></div></section></main>
+<footer><span>© <span id="year"></span> RoomFinder Cameroun</span><a href="/admin">Espace administrateur</a></footer>
+<div id="modal" class="modal hidden"><div class="modal-box"><button id="closeModal" class="close" aria-label="Fermer">×</button><div id="modalContent"></div></div></div><div id="toast" class="toast" role="status"></div><script src="/app.js" defer></script></body></html>
