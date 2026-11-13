@@ -42,7 +42,7 @@ app.use(session({
     maxAge: 8 * 60 * 60 * 1000
   }
 }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 const upload = multer({
   storage: multer.memoryStorage(),
